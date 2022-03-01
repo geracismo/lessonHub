@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Open+Sans:wght@400;500&display=swap');
+
+body{
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link, .btn_bg, .btn_bg:hover {
+    background-color: #8540f5;
+}
+
+.nav-link {
+    color: #8540f5;
+}
+
+.nav-link:hover {
+    color: #8540f5;
+    cursor: pointer;
+}
+
+.no-hover:hover {
+    cursor:not-allowed!important;
+}
+
+.logo{
+    color: #8540f5;
+    font-weight: 500;
+}
+
+.active2{
+    color: #FAFAFA;
+    background-color: #dc3545!important;
+}
+
+.card{
+    max-width: 4rem;
+    max-height: 4rem;
+    border: 0rem;
+    border-radius: 0.4rem;
+    background-color: #8540f5!important;
+}
+
+.card-body{
+    padding: 0.2rem 0.4rem;
+}
+
+.card-title{
+    font-size: 1.8em;
+    margin-bottom: 0rem;
+}
+
+.card-text{
+    font-size: 1em;
+}
+
+.table{
+    border-collapse: separate;
+    border-spacing: 1em;
+}
+
+.table > tbody > tr, .table > tbody > tr > td{
+    vertical-align: middle;
+    padding: 1em 0.5em!important;
+}
+
+.btn_align{
+    vertical-align: top!important;
+}
+
+.width_content{
+    max-width: max-content;
+}
+
+.bg_w{
+    background-color: #FAFAFA;
+}
+
+.hidden{
+    display: none;
+}
+
+.text-transparent{
+    color: transparent!important;
+}
+
+.type-padding{
+    padding-left: 0.4em;
+}
+
+.login-margin{
+    margin-top: 2em;
+}

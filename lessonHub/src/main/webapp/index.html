@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link href="style/style.css" rel="stylesheet">
+    <title>LessonHub</title>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <div id="App">
+      <div class="container-fluid sticky-top bg_w">
+        <div class="container-fluid">
+          <header class="d-flex flex-wrap justify-content-center py-3">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+              <!--<svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>-->
+              <span class="fs-4 logo">LessonHub</span>
+            </a>
+            <ul class="nav nav-pills" v-if="user.role == -1">
+              <li class="nav-item"><a class="nav-link" v-bind:class="[page === '' && hover.guest === '' ? 'active' : '', hover.guest === 'Home' ? 'active' : '']" @click='changePage("", 0)' @mouseover="hover.guest = 'Home'" @mouseleave="hover.guest = ''">Home</a></li>
+              <li class="nav-item"><a class="nav-link" v-bind:class="[page === 'Prenotazioni' && hover.guest === '' ? 'active' : '', hover.guest === 'Prenotazioni' ? 'active' : '']" @click='changePage("Prenotazioni", 0)' @mouseover="hover.guest = 'Prenotazioni'" @mouseleave="hover.guest = ''">Prenotazioni</a></li>
+              <li class="nav-item"><a class="nav-link no-hover" v-bind:class="[hover.guest === 'FAQs' ? 'active' : '']">FAQs</a></li>
+              <li class="nav-item"><a class="nav-link no-hover" v-bind:class="[hover.guest === 'About' ? 'active' : '']">About</a></li>
+            </ul>
+            <ul class="nav nav-pills" v-if="user.role != -1">
+              <li class="nav-item"><a class="nav-link active active2" @click='logout'>Logout</a></li>
+            </ul>
+          </header>
+        </div>
+
+        <div class="container-fluid" v-if="user.role != -1">
+          <header class="d-flex justify-content-center py-3">
+            <ul class="nav nav-pills">
+              <li class="nav-item"><a class="nav-link" v-bind:class="[page === 'Home' && hover.logged === '' ? 'active' : '', hover.logged === 'Home' ? 'active' : '']" @click='changePage("Home", 0)' @mouseover="hover.logged = 'Home'" @mouseleave="hover.logged = ''">Home</a></li>
+              <li class="nav-item"><a class="nav-link" v-bind:class="[page === 'myReservations' && hover.logged === '' ? 'active' : '', hover.logged === 'myReservations' ? 'active' : '']" @click='changePage("myReservations", 0)' @mouseover="hover.logged = 'myReservations'" @mouseleave="hover.logged = ''">myReservations</a></li>
+              <li class="nav-item"><a class="nav-link" v-bind:class="[page === 'History' && hover.logged === '' ? 'active' : '', hover.logged === 'History' ? 'active' : '']" @click='changePage("History", 0)' @mouseover="hover.logged = 'History'" @mouseleave="hover.logged = ''">History</a></li>
+              <li class="nav-item" v-if="user.role == 1"><a class="nav-link" v-bind:class="[page === 'Full History' && hover.logged === '' ? 'active' : '', hover.logged === 'Full History' ? 'active' : '']" @click='changePage("Full History", 0)' @mouseover="hover.logged = 'Full History'" @mouseleave="hover.logged = ''">Full History</a></li>
+              <li class="nav-item" v-if="user.role == 1"><a class="nav-link" v-bind:class="[admin.page != '' && hover.logged === '' ? 'active' : '', hover.logged === 'Admin' ? 'active' : '']" @click='changePage("Corso", 1)' @mouseover="hover.logged = 'Admin'" @mouseleave="hover.logged = ''">Admin</a></li>
+            </ul>
+          </header>
+        </div>
+      </div>
+  
+        <!-- show only if admin button is active-->
+  
+        <div class="container-fluid" v-if='user.role == 1 && page == ""'>
+          <header class="d-flex justify-content-center py-3">
+            <ul class="nav nav-pills">
+              <li class="nav-item"><a class="nav-link" v-bind:class="[admin.page === 'Corso' && hover.admin === '' ? 'active' : '', hover.admin === 'Corso' ? 'active' : '']" @click='changePage("Corso", 1)' @mouseover="hover.admin = 'Corso'" @mouseleave="hover.admin = ''">Corso</a></li>
+              <li class="nav-item"><a class="nav-link" v-bind:class="[admin.page === 'Docente' && hover.admin === '' ? 'active' : '', hover.admin === 'Docente' ? 'active' : '']" @click='changePage("Docente", 1)' @mouseover="hover.admin = 'Docente'" @mouseleave="hover.admin = ''">Docente</a></li>
+              <li class="nav-item"><a class="nav-link" v-bind:class="[admin.page === 'Insegnamento' && hover.admin === '' ? 'active' : '', hover.admin === 'Insegnamento' ? 'active' : '']" @click='changePage("Insegnamento", 1)' @mouseover="hover.admin = 'Insegnamento'" @mouseleave="hover.admin = ''">Insegnamento</a></li>
+            </ul>
+          </header>
+        </div>
+
+        <div class="container d-flex justify-content-center text-center login-margin" v-if='user.role == -1 && page == ""'>
+          <form v-on:submit.prevent="login()">
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Email address</label>
+              <input type="text" placeholder="username" class="form-control" id="username" required>
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Password</label>
+              <input type="password" placeholder="Password" class="form-control" id="password" required>
+            </div>
+            <div class="mb-3">
+              <button type="submit" class="btn btn-primary btn_bg">Login</button>
+            </div>
+          </form>
+        </div>
+  
+        <!-- DOCENTE -->
+        <div class="container" v-if='admin.page == "Docente"'>
+          <div class="container d-flex justify-content-center width_content">
+            <table class="table table-borderless">
+              <thead class="text-center">
+                <tr>
+                  <th>Inserisci Docente</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="shadow-sm mb-5 bg-body rounded">
+                  <td>
+                    <div>
+                      <form class="row row-cols-lg-auto g-3 align-items-center"  v-on:submit.prevent="addDocente()">
+                        <div class="col-12">
+                          <input type="text" v-model="newDocente.dname" placeholder="Nome" class="form-control" id="nome" required>
+                        </div>
+                        <div class="col-12">
+                          <input type="text" placeholder="Cognome" v-model="newDocente.dsurname" class="form-control" id="cognome" required>
+                        </div><div class="col-12">
+                        <select class="form-select" id="gender" v-model="newDocente.gender" required>
+                            <option value="-1" selected>Choose...</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                            <option value="X">X</option>
+                          </select></div><div class="col-12">
+                          <button type="submit" class="btn btn-success btn_align">Aggiungi
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z">
+                              </path>
+                            </svg>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+          <div class="container d-flex justify-content-center width_content">
+            <table class="table table-borderless">
+              <thead class="text-center">
+                <tr>
+                  <th>Docenti attivi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(docente, index) in adminProfessors" class="shadow-sm mb-5 bg-body rounded">
+                  <td>
+                    <div>
+                      <form class="row row-cols-lg-auto g-3 align-items-center" v-on:submit.prevent="removeDocente(docente.id, index)">
+                        <div class="col-12">
+                          <input class="form-control" type="hidden" :value="docente.id" readonly>
+                        </div>
+                        <div class="col-12">
+                          <input class="form-control" type="text" :value="docente.name" readonly>
+                        </div>
+                        <div class="col-12">
+                          <input class="form-control" type="text" :value="docente.surname" readonly>
+                        </div><div class="col-12">
+                          <input class="form-control" type="text" :value="docente.mfx" readonly>
+                        </div><div class="col-12">
+                          <button type="submit" class="btn btn-danger btn_align">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z">
+                              </path>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z">
+                              </path>
+                            </svg></button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <!-- CORSO -->
+        <div class="container" v-if='admin.page == "Corso"'>
+          <div class="container d-flex justify-content-center width_content">
+            <table class="table table-borderless">
+              <thead class="text-center">
+                <tr>
+                  <th>Nuovo Corso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="shadow-sm mb-5 bg-body rounded">
+                  <td>
+                    <div>
+                      <form class="row row-cols-lg-auto g-3 align-items-center" v-on:submit.prevent="addCorso()">
+                        <div class="col-12">
+                          <input type="text" v-model="newCorso.cname" placeholder="Corso" class="form-control" id="basic-url" required>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-success btn_align">Aggiungi
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="16" fill="currentColor"
+                              class="bi bi-plus-lg" viewBox="0 0 16 16">
+                              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z">
+                              </path>
+                            </svg>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+          <div class="container d-flex justify-content-center width_content">
+            <table class="table table-borderless">
+              <thead class="text-center">
+                <tr>
+                  <th>Corsi attivi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(corso, index) in adminCourses" class="shadow-sm mb-5 bg-body rounded">
+                  <td>
+                    <div>
+                      <form class="row row-cols-lg-auto g-3 align-items-center" v-on:submit.prevent="deleteCorso(corso.name, corso.id, index)">
+                        <div class="col-12">
+                          <input class="form-control" type="hidden" :value="corso.id" readonly>
+                        </div>
+                        <div class="col-12">
+                          <input class="form-control" type="text" :value="corso.name" readonly>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-danger btn_align">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z">
+                              </path>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z">
+                              </path>
+                            </svg></button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <!-- INSEGNAMENTO -->
+        <div class="container" v-if='admin.page == "Insegnamento"'>
+          <div class="container d-flex justify-content-center width_content">
+            <table class="table table-borderless">
+              <thead class="text-center">
+                <tr>
+                  <th>Nuova associazione Corso - Docente</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="shadow-sm mb-5 bg-body rounded">
+                  <td>
+                    <div>
+                      <form class="row row-cols-lg-auto g-3 align-items-center" v-on:submit.prevent="addCorsoDocente()">
+                        <div class="col-12">
+                          <select class="form-select" id="inlineFormSelectPref" v-model="newInsegnamento.cid" @change="professorByCourse($event)" required>
+                            <option value="-1" selected>Choose...</option>
+                            <option v-for="corso in selectCourse" :key="corso.id" :value="corso.id">{{ corso.name }}</option>
+                          </select>
+                        </div>
+                        <div class="col-12">
+                          <select class="form-select" id="inlineFormSelectPref" v-model="newInsegnamento.did" required>
+                            <option value="-1" selected>Choose...</option>
+                            <option v-for="professore in selectProfessor" :key="professore.id" :value="professore.id">{{ professore.name + spaceblank + professore.surname }}</option>
+                          </select>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-success btn_align">Aggiungi
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z">
+                              </path>
+                            </svg>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        
+        
+          <div class="container d-flex justify-content-center width_content">
+            <table class="table table-borderless">
+              <thead class="text-center">
+                <tr>
+                  <th>Associazioni Corso - Docente attive</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(insegnamento, index) in adminTeachings" class="shadow-sm mb-5 bg-body rounded">
+                  <td>
+                    <div>
+                      <form class="row row-cols-lg-auto g-3 align-items-center" v-on:submit.prevent="deleteCorsoDocente(insegnamento.course.id, insegnamento.professor.id, index)">
+                        <div class="col-12">
+                          <input class="form-control" type="hidden" :value="insegnamento.id" readonly>
+                        </div>
+                        <div class="col-12">
+                          <input class="form-control" type="hidden" :value="insegnamento.professor.id" readonly>
+                        </div>
+                        <div class="col-12">
+                          <input class="form-control" type="text" :value="insegnamento.course.name" readonly>
+                        </div>
+                        <div class="col-12">
+                          <input class="form-control" type="text" :value="insegnamento.professor.name + spaceblank + insegnamento.professor.surname" readonly>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-danger btn_align">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z">
+                              </path>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z">
+                              </path>
+                            </svg></button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <div class="container">
+          <!-- TABELLA GUEST, USER, ADMIN AVAILABLE RESERVATIONS -->
+          <table class="table table-borderless" v-if='(page == "Home" && user.role != -1) || page == "Prenotazioni"'>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Giorno</th>
+                <th>Corso</th>
+                <th>Professore</th>
+                <th>Orario</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="reservation in availableReservations" class="shadow-sm mb-5 bg-body rounded">
+                <td></td>
+                <td>
+                  <div class="card text-white">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">{{ parseInt((reservation.slot.split(';')[0]).split(' ')[1]) }}</h5>
+                      <p class="card-text">ore {{ parseInt(((reservation.slot.split(';')[1]).split(' ')[1]).split(':')[0]) }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ reservation.course_name }}</td>
+                <td>{{ reservation.name }} {{reservation.surname}}</td>
+                <td>{{ parseInt(((reservation.slot.split(';')[1]).split(' ')[1]).split(':')[0]) }}-{{ parseInt(((reservation.slot.split(';')[1]).split(' ')[1]).split(':')[0])+1 }}</td>
+                <td v-if="user.role != -1">
+                  <a class="btn btn-success" role="button" @click='prenota(reservation.teaching_id, reservation.slot)'>Prenota 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                    </svg>
+                  </a>
+                </td>
+                <td v-else>
+                  <a class="btn btn-success disabled" role="button">Prenota 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+  
+          <!-- TABELLA USER ACTIVE RESERVATIONS -->
+          <table class="table table-borderless" v-if='user.role != -1 && page == "myReservations"'>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Giorno</th>
+                <th>Corso</th>
+                <th>Professore</th>
+                <th>Orario</th>
+                <th></th>
+                <th v-if='user.role == 0 && page == "myReservations"'></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(reservation, index) in myReservations" class="shadow-sm mb-5 bg-body rounded">
+                <td></td>
+                <td>
+                  <div class="card text-white">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">{{ reservation.slot.day }}</h5>
+                      <p class="card-text">ore {{ reservation.slot.hour }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ reservation.course.name }}</td>
+                <td>{{ reservation.professor.name }} {{reservation.professor.surname}}</td>
+                <td>{{ reservation.slot.hour }}-{{ reservation.slot.hour+1 }}</td>
+                <td>
+                  <a class="btn btn-danger" role="button" @click='annullaPrenotazione(reservation.teaching, reservation.slot.day, reservation.slot.hour, index)'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                    </svg>
+                  </a>
+                </td>
+                <td v-if='user.role == 0 && page == "myReservations"'>
+                  <a class="btn btn-success" role="button" @click='confermaPrenotazione(reservation.teaching, reservation.slot.day, reservation.slot.hour, index)'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                      <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"></path>
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+  
+          <!-- TABELLA ADMIN FULL HISTORY (order by user)-->
+          <table class="table table-borderless" v-if='user.role == 1 && page == "Full History"'>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Giorno</th>
+                <th>Corso</th>
+                <th>Professore</th>
+                <th>Orario</th>
+                <th>Utente</th>
+                <th>Stato</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="(userHistoryAdmin, index1) in adminHistory">
+                <tr v-for="(reservation, index2) in userHistoryAdmin.data" class="shadow-sm mb-5 bg-body rounded">
+                  <td></td>
+                  <td>
+                    <div class="card text-white">
+                      <div class="card-body text-center">
+                        <h5 class="card-title">{{ reservation.slot.day }}</h5>
+                        <p class="card-text">ore {{ reservation.slot.hour }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ reservation.course.name }}</td>
+                  <td>{{ reservation.professor.name }} {{reservation.professor.surname}}</td>
+                  <td>{{ reservation.slot.hour }}-{{ reservation.slot.hour+1 }}</td>
+                  <td>{{ userHistoryAdmin.username }}</td>
+                  <td>{{ reservation.status == 0 ? "Attiva" :  reservation.status == 1 ? "Effettuata" : "Annullata"}}</td>
+                  <td>
+                    <a v-if="reservation.status == 0" class="btn btn-danger" role="button" aria-disabled="false" @click='annullaPrenotazioneAdmin(reservation.teaching, reservation.slot.day, reservation.slot.hour, userHistoryAdmin.username, index1, index2)'>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+  
+          <!-- TABELLA USER HISTORY -->
+          <table class="table table-borderless" v-if='user.role != -1 && page == "History"'>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Giorno</th>
+                <th>Corso</th>
+                <th>Professore</th>
+                <th>Orario</th>
+                <th>Stato</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="reservation in history" class="shadow-sm mb-5 bg-body rounded">
+                <td></td>
+                <td>
+                  <div class="card text-white">
+                    <div class="card-body text-center">
+                      <h5 class="card-title">{{ reservation.slot.day }}</h5>
+                      <p class="card-text">ore {{ reservation.slot.hour }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ reservation.course.name }}</td>
+                <td>{{ reservation.professor.name }} {{reservation.professor.surname}}</td>
+                <td>{{ reservation.slot.hour }}-{{ reservation.slot.hour+1 }}</td>
+                <td>{{ reservation.status == 0 ? "Attiva" :  reservation.status == 1 ? "Effettuata" : "Annullata"}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <div class="container">
+          <footer class="py-3">
+            <p class="text-center text-muted mb-0">2021 University Project by Brovia - Geraci</p>
+          </footer>
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+          <div class="toast-container">
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" v-for="(notification, index) in notifications" v-toast>
+              <div class="toast-header">
+                <!-- CALENDARIO OK -->
+                <svg v-if='notification.type == "Prenotazione Effettuata"' xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="green" class="bi bi-calendar2-check-fill" viewBox="0 0 16 16">
+                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zm9.954 3H2.545c-.3 0-.545.224-.545.5v1c0 .276.244.5.545.5h10.91c.3 0 .545-.224.545-.5v-1c0-.276-.244-.5-.546-.5zm-2.6 5.854a.5.5 0 0 0-.708-.708L7.5 10.793 6.354 9.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
+                </svg>
+                <!-- CALENDARIO ERROR -->
+                <svg v-if='notification.type == "Prenotazione Cancellata"' xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="red" class="bi bi-calendar-x-fill" viewBox="0 0 16 16">
+                  <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM6.854 8.146 8 9.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 10l1.147 1.146a.5.5 0 0 1-.708.708L8 10.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 10 6.146 8.854a.5.5 0 1 1 .708-.708z"/>
+                </svg>
+                <!-- OK -->
+                <svg v-if='notification.type == "Operazione Effettuata"' xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+                <!-- AUTORIZZAZIONE -->
+                <svg v-if='notification.type == "Permesso Negato"' xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="red" class="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/>
+                </svg>
+                <!-- INFO -->
+                <svg v-if='notification.type == "LessonHub"' xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="lightblue" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                </svg>
+                <!-- ERROR -->
+                <svg v-if='notification.type == "Errore"' xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="red" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                </svg>
+                <strong class="me-auto type-padding">{{ notification.type }}</strong>
+                <small class="text-muted">now</small>
+                <button type="button" class="btn-close" aria-label="Close" @click='notifications.splice(index, 1)'></button>
+              </div>
+              <div class="toast-body">{{ notification.text }}</div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
