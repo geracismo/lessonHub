@@ -5,7 +5,8 @@ Backend server communicate with clients in json (Google.Gson) format, it is base
 Frontend is developed in Vue.js and Jquery. <br>
 Android application use Android.volley to send http request to server, and SharedPreferences to keep user logged. <br>
 
-Use case: <br>
+<h2> Use case: </h2> <br>
+
   NORMAL USER <br>
 - Book a repetition. <br>
 - Manage own repetition: cancel it or mark as done.
