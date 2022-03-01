@@ -14,7 +14,7 @@ Android application use Android.volley to send http request to server, and Share
 - Login
 - Logout
   
-  ADMIN <br>
+ADMIN <br>
 - All normal-user function except for "mark as done". <br>
 - Can check history of all user. <br>
 - Can add new Professor, Subject and Professor-Subject-Association to the platform. <br>
